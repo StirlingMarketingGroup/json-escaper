@@ -19,15 +19,6 @@ jobs:
         working-directory: assets
         run: npm ci
 
-      - name: setup go
-        uses: actions/setup-go@v2
-        with:
-          go-version: '1.16'
-
-      - name: go build
-        working-directory: assets/go
-        run: GOARCH=wasm GOOS=js go build -o ../../static/lib.wasm
-
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v2
         with:

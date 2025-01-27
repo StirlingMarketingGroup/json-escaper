@@ -1,5 +1,5 @@
 {
-  "name": "go2ts",
+  "name": "json-escaper",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/StirlingMarketingGroup/go2ts/assets"
+    "url": "https://github.com/StirlingMarketingGroup/json-escaper/assets"
   },
   "author": "Brian Leishman",
   "license": "MIT"

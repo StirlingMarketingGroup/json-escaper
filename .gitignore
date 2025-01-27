@@ -1,3 +1,4 @@
 /resources
 /public
 lib.wasm
+.hugo_build.lock

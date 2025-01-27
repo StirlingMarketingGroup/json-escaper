@@ -1,29 +1,7 @@
 'use strict';
 
-const example =
-`type user struct {
-    ID xid.Xid \`json:"id"\`
-    Name string \`json:"name"\`
-    age  int \`json:"age,omitempty"\` // unexported
-
-    Map map[int]*string
-
-    Orders []struct {
-        InvoiceNumber int \`json:"invoiceNumber"\`
-        Quantity int \`json:"qty"\`
-        Details interface{}
-        Created time.Time
-    }
-
-    Created time.Time
-}`;
-
 var src, dst;
 
-// gross global err that we just set from the wasm
-// because throwing isn't possible?
-// and making a function to throw that Go can call gets weird...
-// https://stackoverflow.com/questions/67437284/how-to-throw-js-error-from-go-web-assembly
 var err;
 
 require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.23.0/min/vs' }});
@@ -38,7 +16,7 @@ require(['vs/editor/editor.main'], function() {
 
     src = monaco.editor.create(document.getElementById('src'), {
         value: example,
-        language: 'go',
+        language: 'text',
         theme: 'error',
         minimap: {
             enabled: false
@@ -58,27 +36,37 @@ require(['vs/editor/editor.main'], function() {
         }
     });
 
-    fetch("lib.wasm").then(() => {
-        dst = monaco.editor.create(document.getElementById('dst'), {
-            value: convert(example),
-            language: 'typescript',
-            theme: 'error',
-            minimap: {
-                enabled: false
-            },
-            readOnly: true
-        });
-        dst.onDidFocusEditorText(() => setTimeout(() => dst.setSelection(dst.getModel().getFullModelRange()), 100));
+    dst = monaco.editor.create(document.getElementById('dst'), {
+        value: '',
+        language: 'json',
+        theme: 'error',
+        minimap: {
+            enabled: false
+        },
+        readOnly: true
+    });
+    dst.onDidFocusEditorText(() => setTimeout(() => dst.setSelection(dst.getModel().getFullModelRange()), 100));
 
-        src.getModel().onDidChangeContent(() => {
-            const ts = convert(src.getModel().getValue());
-            if (ts) {
-                monaco.editor.setModelLanguage(dst.getModel(), "typescript");
-                dst.getModel().setValue(ts);
-            } else {
-                monaco.editor.setModelLanguage(dst.getModel(), "error")
-                dst.getModel().setValue(err);
-            }
-        });
+    let settingSrc = false;
+    let settingDst = false;
+
+    src.getModel().onDidChangeContent(() => {
+        if (settingSrc) return;
+        settingDst = true;
+        dst.getModel().setValue(JSON.stringify(src.getModel().getValue()));
+        settingDst = false;
+    });
+
+    dst.getModel().onDidChangeContent(() => {
+        if (settingDst) return;
+        settingSrc = true;
+        try {
+            monaco.editor.setModelLanguage(src.getModel(), "text");
+            src.getModel().setValue(ts);
+        } catch (e) {
+            monaco.editor.setModelLanguage(src.getModel(), "error")
+            src.getModel().setValue(err);
+        }
+        settingSrc = false;
     });
 });
