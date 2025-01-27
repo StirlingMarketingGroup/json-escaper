@@ -15,7 +15,7 @@ require(['vs/editor/editor.main'], function() {
     });
 
     src = monaco.editor.create(document.getElementById('src'), {
-        value: example,
+        value: '',
         language: 'text',
         theme: 'error',
         minimap: {
@@ -43,7 +43,6 @@ require(['vs/editor/editor.main'], function() {
         minimap: {
             enabled: false
         },
-        readOnly: true
     });
     dst.onDidFocusEditorText(() => setTimeout(() => dst.setSelection(dst.getModel().getFullModelRange()), 100));
 
@@ -53,6 +52,7 @@ require(['vs/editor/editor.main'], function() {
     src.getModel().onDidChangeContent(() => {
         if (settingSrc) return;
         settingDst = true;
+        monaco.editor.setModelLanguage(src.getModel(), "text");
         dst.getModel().setValue(JSON.stringify(src.getModel().getValue()));
         settingDst = false;
     });
@@ -62,11 +62,12 @@ require(['vs/editor/editor.main'], function() {
         settingSrc = true;
         try {
             monaco.editor.setModelLanguage(src.getModel(), "text");
-            src.getModel().setValue(ts);
+            src.getModel().setValue(JSON.parse(dst.getModel().getValue()));
         } catch (e) {
             monaco.editor.setModelLanguage(src.getModel(), "error")
             src.getModel().setValue(err);
+        } finally {
+            settingSrc = false;
         }
-        settingSrc = false;
     });
 });
