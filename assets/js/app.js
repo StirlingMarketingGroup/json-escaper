@@ -18,6 +18,7 @@ require(['vs/editor/editor.main'], function() {
         value: '',
         language: 'text',
         theme: 'error',
+        wordWrap: 'on',
         minimap: {
             enabled: false
         }
@@ -40,6 +41,7 @@ require(['vs/editor/editor.main'], function() {
         value: '',
         language: 'json',
         theme: 'error',
+        wordWrap: 'on',
         minimap: {
             enabled: false
         },
